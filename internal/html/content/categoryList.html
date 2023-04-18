@@ -1,0 +1,22 @@
+{{ template "layout.html" . }}
+{{ define "content" }}
+<div id="main">
+  {{ range $index, $category := .categorys }}
+  <article>
+    <header class="article_info">
+      <h1>
+        <a href="">{{ $category.Name }}</a>
+      </h1>
+      <p class="article_time">
+        <time>创建于{{ $category.PublishOn }}</time>
+      </p>
+    </header>
+    <div class="article_content">
+      <a href="">
+        {{ $category.Description }}
+      </a>
+    </div>
+  </article>
+  {{ end }}
+</div>
+{{ end }}

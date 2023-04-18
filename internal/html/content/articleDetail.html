@@ -1,0 +1,41 @@
+{{ define "content" }}
+<div class="blog-post">
+  <h2 class="blog-post-title">标题:{{ .blog.Title }}</h2>
+  <p class="blog-post-meta">发布日期:{{ .blog.PublishOn }}</p>
+  <p>内容:{{ .blog.Content }}</p>
+  <p>分类:
+    {{ range $index, $category := .blog.Categorys }}
+    <a href="/category/detail?id={{ $category.Id }}">{{ $category.Name }}</a>
+    {{ end }}</p>
+  <button class="btn btn-sm btn-primary" onclick="edit()">编辑</button>
+  <button class="btn btn-sm btn-danger" onclick="remove()">删除</button>
+</div>
+{{ end }}
+{{ define "js" }}
+<script type="application/javascript">
+  function edit() {
+    window.location.href = "/article/edit?id={{ .blog.Id }}"
+  }
+  function remove() {
+    if (confirm("确认删除")) {
+      $.ajax({
+        type: "post",
+        url: "/article/delete?id={{ .blog.Id }}",
+        data: "",
+        async: true,
+        success: function (data) {
+          if (data.ret == 0) {
+            window.location.href = "/article";
+          }
+          else {
+            alert("删除博文失败!失败原因:" + data.message);
+          }
+        },
+        error: function (data) {
+          alert("删除博文错误!错误原因:" + data);
+        }
+      });
+    }
+  }
+</script>
+{{ end }}

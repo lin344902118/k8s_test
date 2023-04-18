@@ -1,0 +1,28 @@
+{{ define "content" }}
+<div id="main">
+  {{ range $index, $blog := .blogs }}
+  <article>
+    <header class="article_info">
+      <h1>
+        <a href="">{{ $blog.Title }}</a>
+      </h1>
+      <p class="article_time">
+        <time>发表于{{ $blog.PublishOn }}</time>
+      </p>
+    </header>
+    <div class="article_content">
+      <a href="">
+        {{ $blog.Content }}
+      </a>
+    </div>
+    <footer class="article_footer">
+      <div class="article_catetags">
+        {{ range $tmp, $category := $blog.Categorys }}
+        <a href="/admin/category/detail?id={{ $category.Id }}">{{ $category.Name }}&nbsp&nbsp&nbsp&nbsp;</a>
+        {{ end }}
+      </div>
+    </footer>
+  </article>
+  {{ end }}
+</div>
+{{ end }}
