@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"go_api_framework/global"
-	"go_api_framework/pkg/setting"
+	"k8s_test/global"
+	"k8s_test/pkg/setting"
 	"time"
 )
 

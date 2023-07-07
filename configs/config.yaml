@@ -6,18 +6,10 @@ Server:
 App:
   DefaultPageSize: 10
   MaxPageSize: 100
-  LogSavePath: tmp/logs
+  LogSavePath: /home/lgh/k8s_test/logs
   LogFileName: app
   LogFileExt: .log
   LogTraceEnable: false
-Database:
-  DBType: mysql
-  Username: root  # 填写你的数据库账号
-  Password: 123456  # 填写你的数据库密码
-  Host: 127.0.0.1:3306
-  DBName: go_blog
-  TablePrefix: blog_
-  Charset: utf8
-  ParseTime: True
-  MaxIdleConns: 10
-  MaxOpenConns: 30
+
+Kubernete:
+  KubeConfig: /root/.kube/config

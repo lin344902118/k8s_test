@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"io"
 	"log"
 	"runtime"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Level int8
@@ -147,11 +148,11 @@ func (l *Logger) Output(level Level, message string) {
 }
 
 func (l *Logger) log(level Level, ctx context.Context, v ...interface{}) {
-	l.WithContext(ctx).WithTrace().Output(level, fmt.Sprint(v...))
+	l.WithContext(ctx).Output(level, fmt.Sprint(v...))
 }
 
 func (l *Logger) logf(level Level, ctx context.Context, format string, v ...interface{}) {
-	l.WithContext(ctx).WithTrace().Output(level, fmt.Sprintf(format, v...))
+	l.WithContext(ctx).Output(level, fmt.Sprintf(format, v...))
 }
 
 func (l *Logger) Debug(ctx context.Context, v ...interface{}) {

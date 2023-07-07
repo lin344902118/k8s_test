@@ -1,27 +1,48 @@
 package main
 
 import (
-	"go_api_framework/global"
-	"go_api_framework/internal/model"
-	"go_api_framework/pkg/logger"
-	"go_api_framework/pkg/setting"
-	"gopkg.in/natefinch/lumberjack.v2"
+	"fmt"
+	"k8s_test/global"
+	"k8s_test/internal/model"
+	"k8s_test/pkg/logger"
+	"k8s_test/pkg/setting"
 	"log"
 	"time"
+
+	"k8s_test/internal/controller"
+
+	"github.com/gin-gonic/gin"
+	"gopkg.in/natefinch/lumberjack.v2"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 )
+
+func main() {
+	router := gin.Default()
+	router.Static("/static", "./pkg/static")
+	router.LoadHTMLGlob("pkg/templates/*")
+	// todo 参数校验
+	mainC := controller.NewMainController()
+	router.GET("/index", mainC.GetIndex)
+	deployC := controller.NewDeploymentController()
+	router.POST("/deployment", deployC.CreateDeployment)
+	router.GET("/deployment", deployC.ListDeployment)
+	router.DELETE("/deployment", deployC.DeleteDeployment)
+	router.Run(":" + global.ServerSetting.HttpPort)
+}
 
 func init() {
 	err := setupSettings()
 	if err != nil {
-		log.Fatalf("init.setupSetting err:%v", err)
+		log.Fatalf("init.setupSetting failed.err:%v", err)
 	}
 	err = setupLogger()
 	if err != nil {
-		log.Fatalf("init.setupLogger err: %v", err)
+		log.Fatalf("init.setupLogger failed.err: %v", err)
 	}
-	err = setupDBEngine()
+	err = setupKubernetes()
 	if err != nil {
-		log.Fatalf("init.setupDBEngine err: %v", err)
+		log.Fatalf("init setupKubernetes failed.err:%v", err)
 	}
 }
 
@@ -42,19 +63,21 @@ func setupSettings() error {
 	if err != nil {
 		return err
 	}
+	err = s.ReadSection("Kubernete", &global.KuberneteSetting)
 	global.ServerSetting.ReadTimeout *= time.Second
 	global.ServerSetting.WriteTimeout *= time.Second
+	fmt.Println(global.ServerSetting, global.AppSetting, global.KuberneteSetting)
 	return nil
 }
 
 func setupLogger() error {
+	// todo if LogSavePath not exist should create
 	global.Logger = logger.NewLogger(&lumberjack.Logger{
 		Filename:  global.AppSetting.LogSavePath + "/" + global.AppSetting.LogFileName + global.AppSetting.LogFileExt,
 		MaxSize:   600,
 		MaxAge:    10,
 		LocalTime: true,
 	}, "", log.LstdFlags).WithCaller(2)
-
 	return nil
 }
 
@@ -65,5 +88,18 @@ func setupDBEngine() error {
 		return err
 	}
 
+	return nil
+}
+
+func setupKubernetes() error {
+	var err error
+	global.KubeConfig, err = clientcmd.BuildConfigFromFlags("", global.KuberneteSetting.KubeConfig)
+	if err != nil {
+		return fmt.Errorf("client cmd build config from flags failed.err:%v", err)
+	}
+	global.ClientSet, err = kubernetes.NewForConfig(global.KubeConfig)
+	if err != nil {
+		return fmt.Errorf("kubenetes new for config failed.err:%v", err)
+	}
 	return nil
 }

@@ -34,3 +34,7 @@ type DataBaseSetting struct {
 	TablePrefix  string
 	Charset      string
 }
+
+type KubeneteSetting struct {
+	KubeConfig string
+}

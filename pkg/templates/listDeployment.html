@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>k8s demo</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <main class="d-flex flex-nowrap">
+	   <div class="container">
+        <header class="d-flex justify-content-center py-3">
+            <ul class="nav nav-pills">
+              <li class="nav-item"><a href="/index" class="nav-link" aria-current="page">部署</a></li>
+              <li class="nav-item"><a href="/deployment" class="nav-link active" aria-current="page">查看</a></li>
+            </ul>
+         </header>
+         <table class="table">
+            <thread>
+                <tr>
+                    <th scope="col">序号</th>
+                    <th scope="col">部署名称</th>
+                    <th scope="col">服务个数</th>
+                    <th scope="col">镜像名称</th>
+                    <th scope="col">镜像地址</th>
+                    <th scope="col">镜像端口号</th>
+                    <th scope="col">操作</th>
+                </tr>
+            </thread>
+            <tbody>
+                {{ range $id, $deploy := .deployments }}
+                  <tr>
+                    <th scope="row">{{ $id }}</th>
+                    <th>{{ $deploy.Name }}</th>
+                    <th>{{ $deploy.Replicas }}</th>
+                    <th>{{ $deploy.Template.Container.Name }}</th>
+                    <th>{{ $deploy.Template.Container.Image }}</th>
+                    <th>{{ $deploy.Template.Container.Port }}</th>
+                    <th>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modal" data-name="{{ $deploy.Name }}">删除</button>
+                    </th>
+                  </tr>
+                {{ end }}
+            </tbody>
+         </table>       
+         <div class="modal" id="modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">删除部署</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p id="deploymentName"></p>
+              <p>确定要删除部署吗</p>
+              <p>备注：kubernetes集群需要一段时间才能将部署彻底删除</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger"  id="delDeployment">确定</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+            </div>
+          </div>
+        </div>
+       </div>
+      </div>
+    </main>
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/jquery-3.5.1.min.js"></script>
+    <script>
+        $('#modal').on('show.bs.modal', function(e) {
+            rt = e.relatedTarget
+            name = rt.dataset.name
+            document.getElementById("deploymentName").innerText = name
+        })
+        $("#delDeployment").on('click', function(e) {
+            name = document.getElementById("deploymentName").innerText
+            console.log("name", name)
+            $.ajax({
+                url: "/deployment?name="+name,
+                type: "delete",
+                success: function(result){
+                    $("#modal").modal('hide');
+                    location.reload(true);
+                }
+            })
+        })
+    </script>
+  </body>
+</html>
