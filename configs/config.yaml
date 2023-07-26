@@ -6,7 +6,7 @@ Server:
 App:
   DefaultPageSize: 10
   MaxPageSize: 100
-  LogSavePath: /home/lgh/k8s_test/logs
+  LogSavePath: /tmp/logs
   LogFileName: app
   LogFileExt: .log
   LogTraceEnable: false

@@ -13,7 +13,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gopkg.in/natefinch/lumberjack.v2"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -96,10 +95,6 @@ func setupKubernetes() error {
 	global.KubeConfig, err = clientcmd.BuildConfigFromFlags("", global.KuberneteSetting.KubeConfig)
 	if err != nil {
 		return fmt.Errorf("client cmd build config from flags failed.err:%v", err)
-	}
-	global.ClientSet, err = kubernetes.NewForConfig(global.KubeConfig)
-	if err != nil {
-		return fmt.Errorf("kubenetes new for config failed.err:%v", err)
 	}
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"k8s_test/global"
+	"k8s_test/pkg/client"
 
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
@@ -48,7 +49,7 @@ func NewDeployment(name, imageName, imageAddr string, replicas, port int32) Depl
 
 func CreateDeployment(ctx context.Context, demo DeploymentDemo) error {
 	global.Logger.Infof(ctx, "demo:%+v", demo)
-	deploymentsClient := global.ClientSet.AppsV1().Deployments(apiv1.NamespaceDefault)
+	deploymentsClient := client.NewClients().ClientSet().AppsV1().Deployments(apiv1.NamespaceDefault)
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: demo.Name,
@@ -92,7 +93,7 @@ func CreateDeployment(ctx context.Context, demo DeploymentDemo) error {
 }
 
 func ListDeployment(ctx context.Context) ([]DeploymentDemo, error) {
-	deploymentsClient := global.ClientSet.AppsV1().Deployments(apiv1.NamespaceDefault)
+	deploymentsClient := client.NewClients().ClientSet().AppsV1().Deployments(apiv1.NamespaceDefault)
 	list, err := deploymentsClient.List(ctx, metav1.ListOptions{})
 	if err != nil {
 		global.Logger.Errorf(ctx, "deployments client list failed.err:%v", err)
@@ -119,7 +120,7 @@ func ListDeployment(ctx context.Context) ([]DeploymentDemo, error) {
 }
 
 func UpdateDeployment(ctx context.Context, image string) error {
-	deploymentsClient := global.ClientSet.AppsV1().Deployments(apiv1.NamespaceDefault)
+	deploymentsClient := client.NewClients().ClientSet().AppsV1().Deployments(apiv1.NamespaceDefault)
 	retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		// Retrieve the latest version of Deployment before attempting update
 		// RetryOnConflict uses exponential backoff to avoid exhausting the apiserver
@@ -141,7 +142,7 @@ func UpdateDeployment(ctx context.Context, image string) error {
 func DeleteDeployment(ctx context.Context, name string) error {
 	global.Logger.Info(ctx, "Deleting deployment...")
 	deletePolicy := metav1.DeletePropagationForeground
-	deploymentsClient := global.ClientSet.AppsV1().Deployments(apiv1.NamespaceDefault)
+	deploymentsClient := client.NewClients().ClientSet().AppsV1().Deployments(apiv1.NamespaceDefault)
 	if err := deploymentsClient.Delete(ctx, name, metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	}); err != nil {
